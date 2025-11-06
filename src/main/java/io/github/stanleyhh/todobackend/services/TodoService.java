@@ -10,4 +10,6 @@ public interface TodoService {
     TodoDto getTodoById(String id);
 
     TodoDto createTodo(TodoDto todoDto);
+
+    TodoDto updateTodo(TodoDto todoDto, String id);
 }

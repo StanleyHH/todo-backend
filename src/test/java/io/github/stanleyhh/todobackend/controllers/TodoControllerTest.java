@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -80,5 +81,29 @@ class TodoControllerTest {
     void getTodoById_shouldReturnStatus404_whenInvalidId() throws Exception {
         mockMvc.perform(get("/api/todo/2"))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void updateTodo() throws Exception {
+        Todo todo = Todo.builder()
+                .id("1")
+                .description("desc1")
+                .status(TodoStatus.OPEN)
+                .build();
+        todoRepository.save(todo);
+
+        TodoDto todoDto = TodoDto.builder()
+                .description("desc2")
+                .status(TodoStatus.IN_PROGRESS)
+                .build();
+
+        String todoDtoJson = objectMapper.writeValueAsString(todoDto);
+        String todoJson = objectMapper.writeValueAsString(todo.withDescription("desc2").withStatus(TodoStatus.IN_PROGRESS));
+
+        mockMvc.perform(put("/api/todo/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(todoDtoJson))
+                .andExpect(status().isOk())
+                .andExpect(content().json(todoJson));
     }
 }

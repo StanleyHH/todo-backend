@@ -45,4 +45,11 @@ public class TodoServiceImpl implements TodoService {
 
         return todoMapper.toDto(savedTodo);
     }
+
+    @Override
+    public TodoDto updateTodo(TodoDto todoDto, String id) {
+        Todo todo = todoMapper.fromDto(todoDto);
+        Todo savedTodo = todoRepository.save(todo.withId(id));
+        return todoMapper.toDto(savedTodo);
+    }
 }

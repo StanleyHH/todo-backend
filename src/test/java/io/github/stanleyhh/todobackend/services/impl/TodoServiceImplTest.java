@@ -60,7 +60,7 @@ class TodoServiceImplTest {
     }
 
     @Test
-    void getTodoById_shouldReturnTodoDto_WhenCalledWithValidId() {
+    void getTodoById_shouldReturnTodoDto_whenCalledWithValidId() {
         Todo todo = Todo.builder()
                 .id("1")
                 .description("desc1")
@@ -76,10 +76,26 @@ class TodoServiceImplTest {
     }
 
     @Test
-    void getTodoById_shouldShouldThrowException_WhenCalledWithInvalidId() {
+    void getTodoById_shouldShouldThrowException_whenCalledWithInvalidId() {
         when(todoRepository.findById("2")).thenReturn(Optional.empty());
 
         assertThrows(TodoNotFoundException.class, () -> todoService.getTodoById("2"));
         verify(todoRepository).findById("2");
+    }
+
+    @Test
+    void updateTodo_shouldReturnTodoDto_whenCalledWithValidData() {
+        TodoDto todoDto = TodoDto.builder()
+                .description("desc1")
+                .status(TodoStatus.OPEN)
+                .build();
+        Todo todo = todoMapper.fromDto(todoDto.withId("1"));
+
+        when(todoRepository.save(todo)).thenReturn(todo);
+
+        TodoDto actual = todoService.updateTodo(todoDto, "1");
+
+        verify(todoRepository).save(todo);
+        assertEquals(actual, todoDto.withId("1"));
     }
 }

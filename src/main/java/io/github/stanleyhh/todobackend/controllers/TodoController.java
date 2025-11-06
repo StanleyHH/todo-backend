@@ -5,6 +5,7 @@ import io.github.stanleyhh.todobackend.services.TodoService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,5 +34,10 @@ public class TodoController {
     @PostMapping
     public TodoDto createTodo(@RequestBody TodoDto todoDto) {
         return todoService.createTodo(todoDto);
+    }
+
+    @PutMapping("{id}")
+    public TodoDto updateTodo(@RequestBody TodoDto todoDto, @PathVariable String id) {
+        return todoService.updateTodo(todoDto, id);
     }
 }
