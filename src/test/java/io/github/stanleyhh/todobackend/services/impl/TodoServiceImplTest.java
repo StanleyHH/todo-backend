@@ -1,4 +1,4 @@
-package io.github.stanleyhh.todobackend.services;
+package io.github.stanleyhh.todobackend.services.impl;
 
 import io.github.stanleyhh.todobackend.domain.dto.TodoDto;
 import io.github.stanleyhh.todobackend.domain.entities.Todo;
@@ -6,7 +6,8 @@ import io.github.stanleyhh.todobackend.domain.entities.TodoStatus;
 import io.github.stanleyhh.todobackend.mappers.TodoMapper;
 import io.github.stanleyhh.todobackend.mappers.impl.TodoMapperImpl;
 import io.github.stanleyhh.todobackend.repositories.TodoRepository;
-import io.github.stanleyhh.todobackend.services.impl.TodoServiceImpl;
+import io.github.stanleyhh.todobackend.services.IdService;
+import io.github.stanleyhh.todobackend.services.TodoService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -16,10 +17,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-class TodoServiceTest {
+class TodoServiceImplTest {
     TodoRepository todoRepository = Mockito.mock(TodoRepository.class);
     TodoMapper todoMapper = new TodoMapperImpl();
-    TodoServiceImpl todoService = new TodoServiceImpl(todoRepository, todoMapper);
+    IdService idService = Mockito.mock(IdService.class);
+    TodoService todoService = new TodoServiceImpl(todoRepository, todoMapper, idService);
 
     @Test
     void getAllTodos() {
@@ -34,5 +36,23 @@ class TodoServiceTest {
 
         verify(todoRepository).findAll();
         assertEquals(expected, actual);
+    }
+
+    @Test
+    void createTodo() {
+        TodoDto todoDto = TodoDto.builder()
+                .description("desc1")
+                .status(TodoStatus.OPEN)
+                .build();
+        Todo todo = todoMapper.fromDto(todoDto.withId("1"));
+
+        when(idService.randomId()).thenReturn("1");
+        when(todoRepository.save(todo)).thenReturn(todo);
+
+        TodoDto actual = todoService.createTodo(todoDto);
+
+        verify(todoRepository).save(todo);
+
+        assertEquals(todoDto.withId("1"), actual);
     }
 }

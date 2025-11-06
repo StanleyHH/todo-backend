@@ -1,5 +1,7 @@
 package io.github.stanleyhh.todobackend.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.stanleyhh.todobackend.domain.dto.TodoDto;
 import io.github.stanleyhh.todobackend.domain.entities.Todo;
 import io.github.stanleyhh.todobackend.domain.entities.TodoStatus;
 import io.github.stanleyhh.todobackend.repositories.TodoRepository;
@@ -12,6 +14,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -19,6 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class TodoControllerTest {
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
     MockMvc mockMvc;
@@ -31,9 +35,26 @@ class TodoControllerTest {
         Todo todo = new Todo("1", "desc1", TodoStatus.OPEN);
         todoRepository.save(todo);
 
-        mockMvc.perform(get("/api/todo")
-                        .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/api/todo"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(todo.id()));
+    }
+
+    @Test
+    void createTodo() throws Exception {
+        TodoDto todoDto = TodoDto.builder()
+                .description("desc1")
+                .status(TodoStatus.OPEN)
+                .build();
+        String todoJson = objectMapper.writeValueAsString(todoDto);
+
+        mockMvc.perform(post("/api/todo")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(todoJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").isNotEmpty())
+                .andExpect(jsonPath("$.description").value("desc1"))
+                .andExpect(jsonPath("$.status").value("OPEN"));
+
     }
 }

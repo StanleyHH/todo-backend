@@ -3,6 +3,8 @@ package io.github.stanleyhh.todobackend.controllers;
 import io.github.stanleyhh.todobackend.domain.dto.TodoDto;
 import io.github.stanleyhh.todobackend.services.TodoService;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,7 +20,12 @@ public class TodoController {
     }
 
     @GetMapping
-    List<TodoDto> getAllTodos() {
+    public List<TodoDto> getAllTodos() {
         return todoService.getAllTodos();
+    }
+
+    @PostMapping
+    public TodoDto createTodo(@RequestBody TodoDto todoDto) {
+        return todoService.createTodo(todoDto);
     }
 }
