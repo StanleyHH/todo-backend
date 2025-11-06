@@ -3,6 +3,7 @@ package io.github.stanleyhh.todobackend.services.impl;
 import io.github.stanleyhh.todobackend.domain.dto.TodoDto;
 import io.github.stanleyhh.todobackend.domain.entities.Todo;
 import io.github.stanleyhh.todobackend.domain.entities.TodoStatus;
+import io.github.stanleyhh.todobackend.exceptions.TodoNotFoundException;
 import io.github.stanleyhh.todobackend.mappers.TodoMapper;
 import io.github.stanleyhh.todobackend.mappers.impl.TodoMapperImpl;
 import io.github.stanleyhh.todobackend.repositories.TodoRepository;
@@ -12,8 +13,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -24,7 +27,7 @@ class TodoServiceImplTest {
     TodoService todoService = new TodoServiceImpl(todoRepository, todoMapper, idService);
 
     @Test
-    void getAllTodos() {
+    void getAllTodos_shouldReturnTodoDto_whenCalled() {
         Todo todo1 = new Todo("1", "desc1", TodoStatus.OPEN);
         Todo todo2 = new Todo("2", "desc2", TodoStatus.IN_PROGRESS);
         List<Todo> todos = List.of(todo1, todo2);
@@ -39,7 +42,7 @@ class TodoServiceImplTest {
     }
 
     @Test
-    void createTodo() {
+    void createTodo_shouldReturnTodoDto_whenCalledWithValidData() {
         TodoDto todoDto = TodoDto.builder()
                 .description("desc1")
                 .status(TodoStatus.OPEN)
@@ -54,5 +57,29 @@ class TodoServiceImplTest {
         verify(todoRepository).save(todo);
 
         assertEquals(todoDto.withId("1"), actual);
+    }
+
+    @Test
+    void getTodoById_shouldReturnTodoDto_WhenCalledWithValidId() {
+        Todo todo = Todo.builder()
+                .id("1")
+                .description("desc1")
+                .status(TodoStatus.OPEN)
+                .build();
+
+        when(todoRepository.findById("1")).thenReturn(Optional.of(todo));
+
+        TodoDto actual = todoService.getTodoById("1");
+
+        verify(todoRepository).findById("1");
+        assertEquals(todoMapper.toDto(todo), actual);
+    }
+
+    @Test
+    void getTodoById_shouldShouldThrowException_WhenCalledWithInvalidId() {
+        when(todoRepository.findById("2")).thenReturn(Optional.empty());
+
+        assertThrows(TodoNotFoundException.class, () -> todoService.getTodoById("2"));
+        verify(todoRepository).findById("2");
     }
 }

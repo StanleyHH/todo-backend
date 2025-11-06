@@ -2,6 +2,7 @@ package io.github.stanleyhh.todobackend.services.impl;
 
 import io.github.stanleyhh.todobackend.domain.dto.TodoDto;
 import io.github.stanleyhh.todobackend.domain.entities.Todo;
+import io.github.stanleyhh.todobackend.exceptions.TodoNotFoundException;
 import io.github.stanleyhh.todobackend.mappers.TodoMapper;
 import io.github.stanleyhh.todobackend.repositories.TodoRepository;
 import io.github.stanleyhh.todobackend.services.IdService;
@@ -27,6 +28,12 @@ public class TodoServiceImpl implements TodoService {
         return todoRepository.findAll().stream()
                 .map(todoMapper::toDto)
                 .toList();
+    }
+
+    @Override
+    public TodoDto getTodoById(String id) {
+        Todo todo = todoRepository.findById(id).orElseThrow(() -> new TodoNotFoundException("Todo " + id + " not found"));
+        return todoMapper.toDto(todo);
     }
 
     @Override

@@ -3,6 +3,7 @@ package io.github.stanleyhh.todobackend.controllers;
 import io.github.stanleyhh.todobackend.domain.dto.TodoDto;
 import io.github.stanleyhh.todobackend.services.TodoService;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +23,11 @@ public class TodoController {
     @GetMapping
     public List<TodoDto> getAllTodos() {
         return todoService.getAllTodos();
+    }
+
+    @GetMapping("{id}")
+    public TodoDto getTodoById(@PathVariable String id) {
+        return todoService.getTodoById(id);
     }
 
     @PostMapping

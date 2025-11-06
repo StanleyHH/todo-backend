@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.stanleyhh.todobackend.domain.dto.TodoDto;
 import io.github.stanleyhh.todobackend.domain.entities.Todo;
 import io.github.stanleyhh.todobackend.domain.entities.TodoStatus;
+import io.github.stanleyhh.todobackend.mappers.TodoMapper;
 import io.github.stanleyhh.todobackend.repositories.TodoRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -29,6 +31,8 @@ class TodoControllerTest {
 
     @Autowired
     TodoRepository todoRepository;
+    @Autowired
+    private TodoMapper todoMapper;
 
     @Test
     void getAllTodos() throws Exception {
@@ -55,6 +59,26 @@ class TodoControllerTest {
                 .andExpect(jsonPath("$.id").isNotEmpty())
                 .andExpect(jsonPath("$.description").value("desc1"))
                 .andExpect(jsonPath("$.status").value("OPEN"));
+    }
 
+    @Test
+    void getTodoById_shouldReturnValidJsonAndStatus200_whenValidId() throws Exception {
+        TodoDto todoDto = TodoDto.builder()
+                .description("desc1")
+                .status(TodoStatus.OPEN)
+                .build();
+        Todo todo = todoMapper.fromDto(todoDto.withId("1"));
+        String todoJson = objectMapper.writeValueAsString(todo);
+        todoRepository.save(todo);
+
+        mockMvc.perform(get("/api/todo/1"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(todoJson));
+    }
+
+    @Test
+    void getTodoById_shouldReturnStatus404_whenInvalidId() throws Exception {
+        mockMvc.perform(get("/api/todo/2"))
+                .andExpect(status().isNotFound());
     }
 }
