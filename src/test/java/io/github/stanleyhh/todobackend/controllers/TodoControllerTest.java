@@ -14,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -105,5 +106,18 @@ class TodoControllerTest {
                         .content(todoDtoJson))
                 .andExpect(status().isOk())
                 .andExpect(content().json(todoJson));
+    }
+
+    @Test
+    void deleteTodo() throws Exception {
+        Todo todo = Todo.builder()
+                .id("1")
+                .description("desc1")
+                .status(TodoStatus.OPEN)
+                .build();
+        todoRepository.save(todo);
+
+        mockMvc.perform(delete("/api/todo/1"))
+                .andExpect(status().isOk());
     }
 }

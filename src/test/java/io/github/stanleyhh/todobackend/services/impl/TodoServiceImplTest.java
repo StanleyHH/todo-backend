@@ -17,6 +17,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -97,5 +98,14 @@ class TodoServiceImplTest {
 
         verify(todoRepository).save(todo);
         assertEquals(actual, todoDto.withId("1"));
+    }
+
+    @Test
+    void deleteTodo_shouldDeleteTodo_whenCalledWithValidData() {
+        doNothing().when(todoRepository).deleteById("1");
+
+        todoService.deleteTodo("1");
+
+        verify(todoRepository).deleteById("1");
     }
 }

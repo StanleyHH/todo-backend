@@ -52,4 +52,9 @@ public class TodoServiceImpl implements TodoService {
         Todo savedTodo = todoRepository.save(todo.withId(id));
         return todoMapper.toDto(savedTodo);
     }
+
+    @Override
+    public void deleteTodo(String id) {
+        todoRepository.deleteById(id);
+    }
 }

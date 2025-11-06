@@ -2,6 +2,7 @@ package io.github.stanleyhh.todobackend.controllers;
 
 import io.github.stanleyhh.todobackend.domain.dto.TodoDto;
 import io.github.stanleyhh.todobackend.services.TodoService;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,5 +40,10 @@ public class TodoController {
     @PutMapping("{id}")
     public TodoDto updateTodo(@RequestBody TodoDto todoDto, @PathVariable String id) {
         return todoService.updateTodo(todoDto, id);
+    }
+
+    @DeleteMapping("{id}")
+    public void deleteTodo(@PathVariable String id) {
+        todoService.deleteTodo(id);
     }
 }
